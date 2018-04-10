@@ -16,11 +16,13 @@ module ShopifyApp
 
     def callback
       if auth_hash
+        puts "\ngotan auth hash\n"
         login_shop
+        puts "\nlogin completed\n"
         install_webhooks
         install_scripttags
         perform_after_authenticate_job
-
+        puts "\nredirecting to #{return_address}\n"
         redirect_to return_address
       else
         flash[:error] = I18n.t('could_not_log_in')
@@ -47,14 +49,16 @@ module ShopifyApp
     end
 
     def login_shop
+      puts "\nlogin_shop\n"
       sess = ShopifyAPI::Session.new(shop_name, token)
-
+      puts "\ngot a session\n"
       request.session_options[:renew] = true
       session.delete(:_csrf_token)
 
       session[:shopify] = ShopifyApp::SessionRepository.store(sess)
       session[:shopify_domain] = shop_name
       session[:shopify_user] = associated_user if associated_user.present?
+      puts "\ndone login\n"
     end
 
     def auth_hash
